@@ -1,0 +1,7 @@
+{
+	"ext": "ts,json",
+	"ignore": [
+		"src/**/*.spec.ts"
+	],
+	"exec": "ts-node --files ./dist/index.js"
+}
