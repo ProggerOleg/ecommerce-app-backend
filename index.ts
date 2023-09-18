@@ -3,8 +3,7 @@ import { dbConnect } from './src/config/dbConnect';
 import { authRouter } from './src/routes/auth.route';
 import bodyParser from 'body-parser';
 import { notFound, errorHandler } from './src/middlewares/error.handler.middleware';
-const dotenv = require('dotenv').config();
-
+import 'dotenv/config';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
