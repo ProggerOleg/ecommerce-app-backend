@@ -13,6 +13,7 @@ interface IUser {
     cart: [] | undefined;
     address: Types.ObjectId,
     wishlist: Types.ObjectId,
+    refreshToken: string;
     isPasswordMatched: (password: string) => boolean;
 }
 
@@ -59,7 +60,10 @@ const userSchema = new mongoose.Schema<IUser>({
     wishlist: [ {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
-    } ]
+    } ],
+    refreshToken: {
+        type: String,
+    }
 }, {
     timestamps: true
 }
