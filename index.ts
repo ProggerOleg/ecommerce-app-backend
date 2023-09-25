@@ -6,10 +6,14 @@ import { notFound, errorHandler } from './src/middlewares/error.handler.middlewa
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import { productRouter } from './src/routes/product.route';
+import morgan from 'morgan';
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 dbConnect();
+
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

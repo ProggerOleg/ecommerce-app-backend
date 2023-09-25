@@ -1,4 +1,4 @@
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 
 interface IProduct {
@@ -6,14 +6,13 @@ interface IProduct {
     slug: string;
     description: string;
     price: number;
-    category: Types.ObjectId;
+    category: string;
     brand: string;
     quantity: number;
     sold: number;
     images: [] | undefined;
     color: string;
     ratings: number;
-
 }
 
 const productSchema = new mongoose.Schema<IProduct>({
@@ -37,14 +36,18 @@ const productSchema = new mongoose.Schema<IProduct>({
         required: true
     },
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category"
+        type: String,
+        required: true
     },
     brand: {
         type: String,
-        enum: [ "Apple", "Samsung", "Lenovo" ]
+        required: true
+        // enum: [ "Apple", "Samsung", "Lenovo" ]
     },
-    quantity: Number,
+    quantity: {
+        type: Number,
+        required: true,
+    },
     sold: {
         type: Number,
         default: 0,

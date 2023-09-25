@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import asyncHandler from 'express-async-handler';
 import { generateToken } from "../config/jwtToken";
-import { validateMongoDB } from "../../utils/validateMongoDB";
+import { validateMongoDB } from "../utils/validateMongoDB";
 import { generateRefreshToken } from "../config/refreshToken";
-import jwt, { JwtPayload, Secret, VerifyOptions } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
     const email: string = req.body.email;
