@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import asyncHandler from 'express-async-handler';
 import { generateToken } from "../config/jwtToken";
-import { validateMongoDB } from "../utils/validateMongoDB";
+import { validateMongoDBId } from '../utils/validateMongoDB_Id';
 import { generateRefreshToken } from "../config/refreshToken";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-
+import { sendEmailMiddleware } from "./email.controller";
+import crypto from "crypto";
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
     const email: string = req.body.email;
     const findUser = await User.findOne({ email: email });
@@ -101,7 +102,7 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    validateMongoDB(id);
+    validateMongoDBId(id);
     try {
         const lostUser = await User.findById(id);
         res.json(lostUser);
@@ -112,7 +113,7 @@ export const getUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    validateMongoDB(id);
+    validateMongoDBId(id);
     try {
         const deletedUser = await User.findByIdAndDelete(id);
         res.json(deletedUser);
@@ -123,7 +124,7 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
     const { _id } = (req as any).user;
-    validateMongoDB(_id);
+    validateMongoDBId(_id);
     try {
         const updatedUser = await User.findByIdAndUpdate(_id, {
             firstname: req.body?.firstname,
@@ -143,7 +144,7 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const blockUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    validateMongoDB(id);
+    validateMongoDBId(id);
     try {
         const block = await User.findByIdAndUpdate(id, {
             isBlocked: true
@@ -160,7 +161,7 @@ export const blockUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const unblockUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    validateMongoDB(id);
+    validateMongoDBId(id);
     try {
         const unblock = await User.findByIdAndUpdate(id, {
             isBlocked: false
@@ -174,4 +175,55 @@ export const unblockUser = asyncHandler(async (req: Request, res: Response) => {
     } catch (error: any) {
         throw new Error(error);
     }
+});
+
+export const updatePassword = asyncHandler(async (req: Request, res: Response) => {
+    const { id }: { id: string; } = (req as any).user;
+    const { password } = req.body;
+    validateMongoDBId(id);
+    const user = await User.findById(id);
+    if (user && password) {
+        user.password = password;
+        const updatedPassword = await user.save();
+        res.json(updatedPassword);
+    } else {
+        res.json(user);
+    }
+});
+
+export const forgotPasswordToken = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) throw new Error("User not found with this email");
+    try {
+        const token = await user.createPasswordResetToken();
+        await user.save();
+        const resetURL = `Hi, Please follow this link to reset your password. This link is valid till 10 minutes from now. <a href='http://localhost:5000/api/user/reset-password/${ token }'>Click here</a>`;
+        const data = {
+            to: email,
+            text: "Hey User",
+            subject: "Forgot Password Link",
+            html: resetURL
+        };
+        sendEmailMiddleware(data, req, res);
+        res.json(token);
+    } catch (error: any) {
+        throw new Error(error);
+    }
+});
+
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+    const { password } = req.body;
+    const { token } = req.params;
+    const hashedToken = crypto.createHash('sha256').update(token).digest("hex");
+    const user = await User.findOne({
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { $gt: Date.now() }
+    });
+    if (!user) throw new Error("Token Expired, please try again later");
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    res.json(user);
 });

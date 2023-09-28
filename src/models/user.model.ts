@@ -1,8 +1,9 @@
 import bcrypt = require('bcrypt');
-import mongoose, { Schema, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
+import crypto from 'crypto';
 
 // 1. Create an interface representing a document in MongoDB.
-interface IUser {
+interface IUser extends Document {
     firstname: string;
     lastname: string;
     email: string;
@@ -14,11 +15,15 @@ interface IUser {
     address: Types.ObjectId,
     wishlist: Types.ObjectId,
     refreshToken: string;
+    passwordChangedAt: Date;
+    passwordResetToken: string | undefined;
+    passwordResetExpires: Date | undefined;
     isPasswordMatched: (password: string) => boolean;
+    createPasswordResetToken: () => string;
 }
 
 // Declare the Schema of the Mongo model
-const userSchema = new mongoose.Schema<IUser>({
+const userSchema = new mongoose.Schema({
     firstname: {
         type: String,
         required: true,
@@ -63,19 +68,34 @@ const userSchema = new mongoose.Schema<IUser>({
     } ],
     refreshToken: {
         type: String,
-    }
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
 }, {
     timestamps: true
 }
 );
 
 userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) {
+        next();
+    }
     const salt = await bcrypt.genSaltSync(10);
     this.password = await bcrypt.hash(this.password, salt);
 });
 userSchema.methods.isPasswordMatched = async function(enteredPassword: string) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
+userSchema.methods.createPasswordResetToken = async function() {
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    this.password = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+    this.passwordResetExpires = Date.now() + 30 * 60 * 1000; //10 minutes to reset password
+    return resetToken;
+};
 
 // 3. Create a Model.
-export const User = mongoose.model<IUser>('User', userSchema);
+export const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
