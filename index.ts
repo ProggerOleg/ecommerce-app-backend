@@ -8,6 +8,8 @@ import { productRouter } from './src/routes/product.route';
 import morgan from 'morgan';
 import { blogRouter } from './src/routes/blog.route';
 import 'dotenv/config';
+import { categoryRouter } from './src/routes/product.category.route';
+import { blogCategoryRouter } from './src/routes/blog.category.route';
 
 
 const app = express();
@@ -24,6 +26,8 @@ app.use(cookieParser());
 app.use('/api/user', authRouter);
 app.use('/api/product', productRouter);
 app.use('/api/blog', blogRouter);
+app.use('/api/blog/category', blogCategoryRouter);
+app.use('/api/category', categoryRouter);
 
 app.use(notFound);
 app.use(errorHandler);

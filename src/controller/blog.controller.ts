@@ -34,6 +34,7 @@ export const getBlog = asyncHandler(async (req, res) => {
         const getBlog = await Blog.findById(id)
             .populate("likes")
             .populate('dislikes');
+
         await Blog.findByIdAndUpdate(id, {
             $inc: { numViews: 1 },
         },
