@@ -25,9 +25,9 @@ app.use(cookieParser());
 
 app.use('/api/user', authRouter);
 app.use('/api/product', productRouter);
-app.use('/api/blog', blogRouter);
 app.use('/api/blog/category', blogCategoryRouter);
 app.use('/api/category', categoryRouter);
+app.use('/api/blog', blogRouter);
 
 app.use(notFound);
 app.use(errorHandler);
