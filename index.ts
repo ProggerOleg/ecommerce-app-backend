@@ -10,6 +10,8 @@ import { blogRouter } from './src/routes/blog.route';
 import 'dotenv/config';
 import { categoryRouter } from './src/routes/product.category.route';
 import { blogCategoryRouter } from './src/routes/blog.category.route';
+import { brandRouter } from './src/routes/brand.route';
+import { couponRouter } from './src/routes/coupon.route';
 
 
 const app = express();
@@ -28,6 +30,8 @@ app.use('/api/product', productRouter);
 app.use('/api/blog/category', blogCategoryRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/blog', blogRouter);
+app.use('/api/brand', brandRouter);
+app.use('/api/coupon', couponRouter);
 
 app.use(notFound);
 app.use(errorHandler);

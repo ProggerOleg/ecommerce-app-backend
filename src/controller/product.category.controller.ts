@@ -1,8 +1,9 @@
 import { PCategory } from "../models/product.category.model";
+import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { validateMongoDBId } from "../utils/validateMongoDB_Id";
 
-export const createCategory = asyncHandler(async (req, res) => {
+export const createCategory = asyncHandler(async (req: Request, res: Response) => {
     try {
         const newCategory = await PCategory.create(req.body);
         res.json(newCategory);
@@ -11,7 +12,7 @@ export const createCategory = asyncHandler(async (req, res) => {
     }
 });
 
-export const updateCategory = asyncHandler(async (req, res) => {
+export const updateCategory = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     validateMongoDBId(id);
     try {
@@ -25,7 +26,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
 });
 
 
-export const deleteCategory = asyncHandler(async (req, res) => {
+export const deleteCategory = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     validateMongoDBId(id);
     try {
@@ -36,7 +37,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     }
 });
 
-export const getCategory = asyncHandler(async (req, res) => {
+export const getCategory = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const singleCategory = await PCategory.findById(id);
@@ -46,7 +47,7 @@ export const getCategory = asyncHandler(async (req, res) => {
     }
 });
 
-export const getAllCategory = asyncHandler(async (req, res) => {
+export const getAllCategory = asyncHandler(async (req: Request, res: Response) => {
     try {
         const allCategory = await PCategory.find();
         res.json(allCategory);

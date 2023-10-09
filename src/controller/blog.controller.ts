@@ -1,10 +1,10 @@
 import { Blog } from "../models/blog.model";
-import { User } from "../models/user.model";
+import { Request, Response } from "express";
 import asyncHandler from 'express-async-handler';
 import { validateMongoDBId } from "../utils/validateMongoDB_Id";
 
 
-export const createBlog = asyncHandler(async (req, res) => {
+export const createBlog = asyncHandler(async (req: Request, res: Response) => {
     try {
         const newBlog = await Blog.create(req.body);
         res.json(newBlog);
@@ -13,7 +13,7 @@ export const createBlog = asyncHandler(async (req, res) => {
     }
 });
 
-export const updateBlog = asyncHandler(async (req, res) => {
+export const updateBlog = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     validateMongoDBId(id);
     try {
@@ -27,7 +27,7 @@ export const updateBlog = asyncHandler(async (req, res) => {
 });
 
 
-export const getBlog = asyncHandler(async (req, res) => {
+export const getBlog = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     validateMongoDBId(id);
     try {
@@ -47,7 +47,7 @@ export const getBlog = asyncHandler(async (req, res) => {
 });
 
 
-export const getAllBlogs = asyncHandler(async (req, res) => {
+export const getAllBlogs = asyncHandler(async (req: Request, res: Response) => {
     try {
         const allBlogs = await Blog.find();
         res.json(allBlogs);
@@ -57,7 +57,7 @@ export const getAllBlogs = asyncHandler(async (req, res) => {
 });
 
 
-export const deleteBlog = asyncHandler(async (req, res) => {
+export const deleteBlog = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     validateMongoDBId(id);
     try {
@@ -68,7 +68,7 @@ export const deleteBlog = asyncHandler(async (req, res) => {
     }
 });
 
-export const likeBlog = asyncHandler(async (req, res) => {
+export const likeBlog = asyncHandler(async (req: Request, res: Response) => {
     const { blogId } = req.body;
     validateMongoDBId(blogId);
     // Find the blog which you want to be liked
@@ -114,7 +114,7 @@ export const likeBlog = asyncHandler(async (req, res) => {
         res.json(blog);
     }
 });
-export const dislikeBlog = asyncHandler(async (req, res) => {
+export const dislikeBlog = asyncHandler(async (req: Request, res: Response) => {
     const { blogId } = req.body;
     validateMongoDBId(blogId);
     // Find the blog which you want to be liked
