@@ -1,22 +1,20 @@
-import { v2 as cloudinary } from 'cloudinary';
-
+import { UploadApiErrorResponse, v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_SECRET_KEY
+    cloud_name: 'davbaeqte',
+    api_key: '715979897411124',
+    api_secret: '***************************'
 });
 
-export const cloudinaryUploadImg = async (fileToUploads: any) => {
-    return new Promise((resolve: any) => {
-        cloudinary.uploader.upload(fileToUploads, (result: any) => {
+
+export const cloudinaryUploadImg = async (imagePath: string, name: string) => {
+    return new Promise((resolve) => {
+        cloudinary.uploader.upload(imagePath, (result) => {
             resolve(
                 {
-                    url: result.secure_url,
+                    url: result?.secure_url,
                 },
-                {
-                    resource_type: "auto",
-                });
+            );
         });
     });
 };

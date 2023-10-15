@@ -3,6 +3,10 @@ import { Request, Response } from "express";
 import asyncHandler from 'express-async-handler';
 import slugify from "slugify";
 import { User } from "../models/user.model";
+import { validateMongoDBId } from "../utils/validateMongoDB_Id";
+import fs from 'fs';
+import { cloudinaryUploadImg } from "../utils/cloudinary";
+
 
 export const createProduct = asyncHandler(async (req: Request, res: Response) => {
     try {
@@ -173,6 +177,38 @@ export const ratingProduct = asyncHandler(async (req: Request, res: Response) =>
             { new: true }
         );
         res.json(finalproduct);
+    } catch (error: any) {
+        throw new Error(error);
+    }
+});
+
+export const uploadImages = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDBId(id);
+    try {
+        console.log(req.files);
+        const uploader = (path: string) => cloudinaryUploadImg(path, "images");
+        const urls = [];
+        const files = req.files;
+        for (const file of (files as any)) {
+            const { path } = file;
+            console.log(path);
+            const newpath = await uploader(path);
+            console.log(newpath);
+            urls.push(newpath);
+        }
+        const findProduct = await Product.findByIdAndUpdate(
+            id,
+            {
+                images: urls.map((file) => {
+                    return file;
+                }),
+            },
+            {
+                new: true,
+            }
+        );
+        res.json(findProduct);
     } catch (error: any) {
         throw new Error(error);
     }

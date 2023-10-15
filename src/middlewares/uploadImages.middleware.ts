@@ -8,7 +8,7 @@ type FileNameCallback = (error: Error | null, filename: string) => void;
 
 const multerStorage = multer.diskStorage({
     destination: function(request: Request, file: Express.Multer.File, cb: DestinationCallback): void {
-        cb(null, path.join(__dirname, '../public/images'));
+        cb(null, path.join(__dirname, '../../public/images'));
     },
     filename: function(req: Request, file: Express.Multer.File, cb: FileNameCallback): void {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -23,18 +23,36 @@ const multerFilter = (request: Request, file: Express.Multer.File, cb: FileFilte
         cb(null, false);
     }
 };
-
-const productImgResize = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    if (!req.files) return next();
+export const productImgResize = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.files || !Array.isArray(req.files)) return next();
     await Promise.all(
         req.files.map(async (file: any) => {
-            await sharp(file.path).resize(300, 300).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/images/products/${ file.filename }`);
+            await sharp(file.path)
+                .resize(300, 300)
+                .toFormat("jpeg")
+                .jpeg({ quality: 90 })
+                .toFile(`public/images/products/${ file.filename }`);
         })
     );
+    next();
+};
+
+export const blogImgResize = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.files || !Array.isArray(req.files)) return next();
+    await Promise.all(
+        req.files.map(async (file: any) => {
+            await sharp(file.path)
+                .resize(300, 300)
+                .toFormat("jpeg")
+                .jpeg({ quality: 90 })
+                .toFile(`public/images/blogs/${ file.filename }`);
+        })
+    );
+    next();
 };
 
 export const uploadPhoto = multer({
     storage: multerStorage,
     fileFilter: multerFilter,
-    limits: { fieldSize: 200000 }
+    limits: { fieldSize: 2000000 }
 });
