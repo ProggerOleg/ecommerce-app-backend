@@ -1,37 +1,46 @@
 import express from 'express';
-import { dbConnect } from './src/config/dbConnect';
 import { authRouter } from './src/routes/auth.route';
 import bodyParser from 'body-parser';
 import { notFound, errorHandler } from './src/middlewares/error.handler.middleware';
 import cookieParser from 'cookie-parser';
-import { productRouter } from './src/routes/product.route';
+import { productRouter } from './src/routes/deal.route';
 import morgan from 'morgan';
-import { blogRouter } from './src/routes/blog.route';
 import 'dotenv/config';
-import { categoryRouter } from './src/routes/product.category.route';
-import { blogCategoryRouter } from './src/routes/blog.category.route';
-import { brandRouter } from './src/routes/brand.route';
-import { couponRouter } from './src/routes/coupon.route';
+import cors from 'cors';
+import { Sequelize } from "sequelize";
+
+const sequelize = new Sequelize(
+    'test',
+    `${ process.env.DATABASE_USERNAME }`,
+    process.env.DATABASE_PASSWORD,
+    {
+        host: 'localhost',
+        dialect: 'mysql'
+    }
+);
 
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-dbConnect();
+sequelize.authenticate().then(() => {
+    console.log('Connection has been established successfully.');
+}).catch((error: any) => {
+    console.error('Unable to connect to the database: ', error);
+});
 
 app.use(morgan('dev'));
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
 app.use('/api/user', authRouter);
-app.use('/api/product', productRouter);
-app.use('/api/blog/category', blogCategoryRouter);
-app.use('/api/category', categoryRouter);
-app.use('/api/blog', blogRouter);
-app.use('/api/brand', brandRouter);
-app.use('/api/coupon', couponRouter);
+app.use('/api/deals', productRouter);
 
 app.use(notFound);
 app.use(errorHandler);

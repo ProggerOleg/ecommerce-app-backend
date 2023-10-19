@@ -1,5 +1,5 @@
-import { blockUser, createUser, deleteUser, forgotPasswordToken, getAllUsers, getUser, handleRefreshToken, logginUser, logoutUser, resetPassword, unblockUser, updatePassword, updateUser } from '../controller/user.contoller';
-import { authMiddleware, isAdmin } from '../middlewares/auth.middleware';
+import { createUser, forgotPasswordToken, getUser, handleRefreshToken, logginUser, logoutUser, resetPassword, updatePassword } from '../controller/user.contoller';
+import { authMiddleware } from '../middlewares/auth.middleware';
 import express from 'express';
 
 
@@ -12,12 +12,7 @@ router.put('/reset-password/:token', resetPassword);
 router.put('/password', authMiddleware, updatePassword);
 router.post('/login', logginUser);
 router.get('/logout', logoutUser);
-router.get('/all-users', getAllUsers);
 router.get('/refresh', handleRefreshToken);
-router.put('/edit-user', authMiddleware, updateUser);
-router.get('/:id', authMiddleware, isAdmin, getUser);
-router.delete('/:id', deleteUser);
-router.put('/block-user/:id', authMiddleware, isAdmin, blockUser);
-router.put('/unblock-user/:id', authMiddleware, isAdmin, unblockUser);
+router.get('/:id', authMiddleware, getUser);
 
 export { router as authRouter };

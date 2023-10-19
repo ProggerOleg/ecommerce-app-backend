@@ -12,8 +12,8 @@ interface IDataInterface {
 export const sendEmailMiddleware = async (data: IDataInterface, req: Request, res: Response) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
+        port: 587,
+        secure: false,
         auth: {
             // TODO: replace `user` and `pass` values from <https://forwardemail.net>
             user: process.env.EMAIL_ID,
@@ -23,7 +23,7 @@ export const sendEmailMiddleware = async (data: IDataInterface, req: Request, re
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
-        from: '"Hey 👻" <abc@example.com>', // sender address
+        from: `"Hey 👻" ${ process.env.EMAIL_ID }`, // sender address
         to: data.to, // list of receivers
         subject: data.subject, // Subject line
         text: data.text, // plain text body
